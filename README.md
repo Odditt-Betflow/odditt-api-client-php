@@ -48,29 +48,36 @@ a short-lived Bearer JWT (via `POST /v1/auth/login` or `POST /v1/oauth/login`) a
 transparently refreshes it before it expires. Data endpoints also accept the API
 key directly via the `X-API-Key` header, so no login round-trip is needed for them.
 
+Authenticate with an **API key** (X-API-Key on data endpoints; auto-login +
+refresh Bearer for account endpoints):
+
 ```php
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-// Option A — API key (X-API-Key on data endpoints; auto-login + refresh Bearer
-// for account endpoints):
 $session = Odditt\ApiClient\AuthSession::fromApiKey('YOUR_API_KEY');
-
-// Option B — OAuth client credentials (auto-refreshed Bearer everywhere):
-// $session = Odditt\ApiClient\AuthSession::fromClientCredentials('CLIENT_ID', 'CLIENT_SECRET');
 
 $apiInstance = new Odditt\ApiClient\Api\AccountApi(
     new GuzzleHttp\Client(),
     $session->getConfiguration()
 );
+print_r($apiInstance->v1AccountApiKeysGet());
+```
 
-try {
-    $result = $apiInstance->v1AccountApiKeysGet();
-    print_r($result);
-} catch (Exception $e) {
-    echo 'Exception when calling AccountApi->v1AccountApiKeysGet: ', $e->getMessage(), PHP_EOL;
-}
+Or authenticate with **OAuth client credentials** (auto-refreshed Bearer
+everywhere):
 
+```php
+<?php
+require_once(__DIR__ . '/vendor/autoload.php');
+
+$session = Odditt\ApiClient\AuthSession::fromClientCredentials('CLIENT_ID', 'CLIENT_SECRET');
+
+$apiInstance = new Odditt\ApiClient\Api\AccountApi(
+    new GuzzleHttp\Client(),
+    $session->getConfiguration()
+);
+print_r($apiInstance->v1AccountApiKeysGet());
 ```
 
 ## API Endpoints
