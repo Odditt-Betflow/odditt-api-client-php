@@ -42,21 +42,26 @@ require_once('/path/to/odditt-api-client/vendor/autoload.php');
 
 Please follow the [installation procedure](#installation--usage) and then run the following:
 
+You authenticate with **either** an API key **or** OAuth client credentials — you
+do not supply a Bearer token yourself. `AuthSession` exchanges your credential for
+a short-lived Bearer JWT (via `POST /v1/auth/login` or `POST /v1/oauth/login`) and
+transparently refreshes it before it expires. Data endpoints also accept the API
+key directly via the `X-API-Key` header, so no login round-trip is needed for them.
+
 ```php
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
+// Option A — API key (X-API-Key on data endpoints; auto-login + refresh Bearer
+// for account endpoints):
+$session = Odditt\ApiClient\AuthSession::fromApiKey('YOUR_API_KEY');
 
-
-// Configure Bearer (JWT) authorization: BearerAuth
-$config = Odditt\ApiClient\Configuration::getDefaultConfiguration()->setAccessToken('YOUR_ACCESS_TOKEN');
-
+// Option B — OAuth client credentials (auto-refreshed Bearer everywhere):
+// $session = Odditt\ApiClient\AuthSession::fromClientCredentials('CLIENT_ID', 'CLIENT_SECRET');
 
 $apiInstance = new Odditt\ApiClient\Api\AccountApi(
-    // If you want use custom http client, pass your client which implements `GuzzleHttp\ClientInterface`.
-    // This is optional, `GuzzleHttp\Client` will be used as default.
     new GuzzleHttp\Client(),
-    $config
+    $session->getConfiguration()
 );
 
 try {
